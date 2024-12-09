@@ -58,11 +58,7 @@ export default function Login() {
               />
             </div>
           </div>
-          <div className="flex items-center justify-between mb-4">
-            <label className="flex items-center">
-              <input type="checkbox" className="form-checkbox text-purple-500" />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
+          <div className="flex items-center justify-start mb-4">
             <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-gray-800">
               Forgot password?
             </Link>
