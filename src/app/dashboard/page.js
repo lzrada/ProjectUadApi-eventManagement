@@ -1,4 +1,4 @@
-import DashboardSewaGedung from './components/dashboardsewagedung';
+import DashboardSewaGedung from "./components/dashboardsewagedung";
 
 export default function DashboardPage() {
   return (
@@ -6,4 +6,4 @@ export default function DashboardPage() {
       <DashboardSewaGedung />
     </main>
   );
-}   
+}

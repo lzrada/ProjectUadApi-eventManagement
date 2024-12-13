@@ -18,7 +18,11 @@ export default function Login() {
     try {
       const user = await loginWithEmailAndPassword(email, password);
       console.log("Logged in user:", user);
-      router.push("/dashboard"); // Redirect to dashboard after login
+      if (email === "admin@gmail.com" && password === "admin123") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       setError("Invalid email or password.");
     }

@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Modal } from "./ui/Modal"; // Pastikan Anda memiliki komponen modal ini
 import { Calendar, ChevronLeft, ChevronRight, LogOut, Settings, Calendar as CalendarIcon, MessageSquare, Layout, Box } from "lucide-react";
+import Link from "next/link";
 
 const DashboardSewaGedung = () => {
   const [bulanIni, setBulanIni] = useState(new Date());
@@ -66,10 +67,8 @@ const DashboardSewaGedung = () => {
 
   const menuItems = [
     { icon: Layout, text: "Dashboard" },
-    { icon: MessageSquare, text: "Pesan" },
     { icon: CalendarIcon, text: "Kalender" },
-    { icon: Box, text: "Daftar Gedung" },
-    { icon: Settings, text: "Pengaturan" },
+    { icon: Box, text: "Daftar Pemesanan" },
     { icon: LogOut, text: "Keluar" },
   ];
 
@@ -82,12 +81,14 @@ const DashboardSewaGedung = () => {
           <span className="font-semibold">Sewa Gedung</span>
         </div>
 
-        <nav className="space-y-4">
+        <nav className="space-y-4 ">
           {menuItems.map((item, index) => (
-            <Button key={index} variant="ghost" className="w-full justify-start text-white hover:bg-pink-500">
-              <item.icon className="mr-2 h-4 w-4" />
-              {item.text}
-            </Button>
+            <Link href={`/${item.text.toLowerCase()}`} key={index}>
+              <Button variant="ghost" className="w-full my-2 justify-start text-white hover:bg-pink-500">
+                <item.icon className="mr-2 h-4 w-4" />
+                {item.text}
+              </Button>
+            </Link>
           ))}
         </nav>
       </div>
