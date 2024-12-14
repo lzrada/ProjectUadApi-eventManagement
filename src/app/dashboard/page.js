@@ -1,9 +1,11 @@
-import DashboardSewaGedung from "./components/dashboardsewagedung";
+"use client";
+import DraggableCalendar from "./components/ui/DraggableCalender";
 
 export default function DashboardPage() {
   return (
-    <main>
-      <DashboardSewaGedung />
-    </main>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <DraggableCalendar />
+    </div>
   );
 }
