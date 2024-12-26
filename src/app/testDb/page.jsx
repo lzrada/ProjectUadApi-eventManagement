@@ -1,14 +1,41 @@
 "use client";
 import { useState } from "react";
 import db from "../../../services/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 export default function SaveData() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
+  // Fungsi untuk mengecek apakah email sudah ada di Firestore
+  const checkEmailExists = async (email) => {
+    try {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+
+      // Jika querySnapshot ada isinya, berarti email sudah terdaftar
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error("Error mengecek email: ", error);
+      throw new Error("Gagal memeriksa email");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Mengecek apakah nama dan email sudah diisi
+    if (!name || !email) {
+      return alert("Nama dan Email harus diisi!");
+    }
+
+    // Mengecek apakah email sudah ada dalam database
+    const emailExists = await checkEmailExists(email);
+
+    if (emailExists) {
+      return alert("Email sudah digunakan, silakan gunakan email lain.");
+    }
 
     try {
       // Menambahkan data ke koleksi 'users'
