@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc } from "firebase/firestore"; // Mengimpor getDoc
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
 import db from "../../../services/firebase";
 import fs from "fs";
 import path from "path";
 
 export async function GET() {
   try {
-    const animeCollection = collection(db, "animes");
-    const snapshot = await getDocs(animeCollection);
-    const animeList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return NextResponse.json({ data: animeList });
+    const eventCollection = collection(db, "events");
+    const snapshot = await getDocs(eventCollection);
+    const eventList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return NextResponse.json({ data: eventList });
   } catch (error) {
-    console.error("Error fetching anime list:", error.message);
-    return NextResponse.json({ error: "Failed to fetch anime list" }, { status: 500 });
+    console.error("Error fetching event list:", error.message);
+    return NextResponse.json({ error: "Failed to fetch event list" }, { status: 500 });
   }
 }
 
@@ -23,20 +23,21 @@ export async function POST(req) {
     const description = formData.get("description");
     const imageFile = formData.get("image");
 
+    // Generate image name and save image to the server
     const imageName = `${Date.now()}-${imageFile.name}`;
     const filePath = `/images/api/${imageName}`;
     const absolutePath = path.join(process.cwd(), "public", filePath);
     const buffer = Buffer.from(await imageFile.arrayBuffer());
     fs.writeFileSync(absolutePath, buffer);
 
-    const newAnime = { title, description, image: filePath };
-    const animeCollection = collection(db, "animes");
-    const docRef = await addDoc(animeCollection, newAnime);
+    const newEvent = { title, description, image: filePath };
+    const eventCollection = collection(db, "events");
+    const docRef = await addDoc(eventCollection, newEvent);
 
-    return NextResponse.json({ message: "Anime added", data: { id: docRef.id, ...newAnime } });
+    return NextResponse.json({ message: "Event added", data: { id: docRef.id, ...newEvent } });
   } catch (error) {
-    console.error("Error adding anime:", error.message);
-    return NextResponse.json({ error: "Failed to add anime" }, { status: 500 });
+    console.error("Error adding event:", error.message);
+    return NextResponse.json({ error: "Failed to add event" }, { status: 500 });
   }
 }
 
@@ -48,46 +49,47 @@ export async function PUT(req) {
     const description = formData.get("description");
     const imageFile = formData.get("image");
 
-    const animeDoc = doc(db, "animes", id);
+    const eventDoc = doc(db, "events", id);
     const updateData = { title, description };
 
+    // Check if new image is uploaded and handle the image upload
     if (imageFile && imageFile.size > 0) {
       const imageName = `${Date.now()}-${imageFile.name}`;
       const filePath = `/images/api/${imageName}`;
       const absolutePath = path.join(process.cwd(), "public", filePath);
       const buffer = Buffer.from(await imageFile.arrayBuffer());
       fs.writeFileSync(absolutePath, buffer);
-      updateData.image = filePath;
+      updateData.image = filePath; // Update image path if a new image is uploaded
     }
 
-    await updateDoc(animeDoc, updateData);
-    return NextResponse.json({ message: "Anime updated", data: { id, ...updateData } });
+    await updateDoc(eventDoc, updateData);
+    return NextResponse.json({ message: "Event updated", data: { id, ...updateData } });
   } catch (error) {
-    console.error("Error updating anime:", error.message);
-    return NextResponse.json({ error: "Failed to update anime" }, { status: 500 });
+    console.error("Error updating event:", error.message);
+    return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
   }
 }
 
 export async function DELETE(req) {
   try {
     const { id } = await req.json();
-    const animeDoc = doc(db, "animes", id);
+    const eventDoc = doc(db, "events", id);
 
-    // Ambil data anime untuk mendapatkan informasi gambar yang akan dihapus
-    const animeData = await getDoc(animeDoc);
-    const imagePath = animeData.data()?.image; // Ambil gambar
+    // Retrieve event data to get the image info to delete
+    const eventData = await getDoc(eventDoc);
+    const imagePath = eventData.data()?.image;
 
     if (imagePath) {
       const imageFilePath = path.join(process.cwd(), "public", imagePath);
-      // Hapus gambar dari disk
+      // Delete image from disk
       fs.unlinkSync(imageFilePath);
     }
 
-    // Hapus anime dari Firestore
-    await deleteDoc(animeDoc);
-    return NextResponse.json({ message: "Anime deleted" });
+    // Delete event from Firestore
+    await deleteDoc(eventDoc);
+    return NextResponse.json({ message: "Event deleted" });
   } catch (error) {
-    console.error("Error deleting anime:", error.message);
-    return NextResponse.json({ error: "Failed to delete anime" }, { status: 500 });
+    console.error("Error deleting event:", error.message);
+    return NextResponse.json({ error: "Failed to delete event" }, { status: 500 });
   }
 }

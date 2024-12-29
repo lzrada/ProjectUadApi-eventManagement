@@ -18,7 +18,7 @@ export default function Sidebar() {
             <nav className="flex flex-col mt-4 space-y-4">
               <Link href="/dashboard">
                 <p className="flex items-center px-4 py-2 hover:bg-gray-700 rounded-md">
-                  <span className="text-2xl">🏠</span>
+                  <span className="text-2xl active:bg-gray-700">🏠</span>
                   {isOpen && <span className="ml-4">Dashboard</span>}
                 </p>
               </Link>
