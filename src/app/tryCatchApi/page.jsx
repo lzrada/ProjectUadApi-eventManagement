@@ -4,11 +4,16 @@ import { useEffect, useState, useRef } from "react";
 
 export default function EventList() {
   const [eventList, setEventList] = useState([]);
-  const [newEvent, setNewEvent] = useState({ title: "", description: "", image: null });
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [debounceTimeout, setDebounceTimeout] = useState(null);
-  const [error, setError] = useState(""); // State for error message
-  const fileInputRef = useRef(null); // Create a ref for the file input
+  const [updateEvent, setUpdateEvent] = useState(null);
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    description: "",
+    image: null,
+    date: "", // Menambahkan inisialisasi untuk date
+    price: "", // Menambahkan inisialisasi untuk price
+  });
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -22,7 +27,7 @@ export default function EventList() {
 
   const handleAddEvent = async () => {
     if (!newEvent.title || !newEvent.description || !newEvent.image) {
-      setError("Title, description, and image cannot be empty!");
+      setError("Judul, deskripsi, dan gambar tidak boleh kosong!");
       return;
     }
 
@@ -32,6 +37,8 @@ export default function EventList() {
     formData.append("title", newEvent.title);
     formData.append("description", newEvent.description);
     formData.append("image", newEvent.image);
+    formData.append("date", newEvent.date);
+    formData.append("price", newEvent.price);
 
     const res = await fetch("/api", {
       method: "POST",
@@ -41,60 +48,53 @@ export default function EventList() {
     if (res.ok) {
       const result = await res.json();
       setEventList((prev) => [...prev, result.data]);
-      setNewEvent({ title: "", description: "", image: null });
+      setNewEvent({ title: "", description: "", image: null, date: "", price: "" });
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } else {
-      setError("Failed to add event. Try again.");
+      setError("Gagal menambahkan event. Coba lagi.");
     }
   };
 
-  const handleUpdateEvent = async (id) => {
-    const eventToUpdate = eventList.find((event) => event.id === id);
-    const updatedTitle = prompt("Update title", eventToUpdate.title);
-    const updatedDescription = prompt("Update description", eventToUpdate.description);
+  const handleUpdateEvent = async () => {
+    if (!updateEvent.title || !updateEvent.description) {
+      setError("Judul dan deskripsi tidak boleh kosong!");
+      return;
+    }
 
-    if (updatedTitle && updatedDescription) {
-      const formData = new FormData();
-      formData.append("id", id);
-      formData.append("title", updatedTitle);
-      formData.append("description", updatedDescription);
+    setError("");
 
-      const newImage = window.confirm("Do you want to update the image?");
-      if (newImage) {
-        const imageFile = await selectFile(); // Prompt file selection
-        if (imageFile) {
-          formData.append("image", imageFile);
-        }
+    const formData = new FormData();
+    formData.append("id", updateEvent.id);
+    formData.append("title", updateEvent.title);
+    formData.append("description", updateEvent.description);
+    formData.append("date", updateEvent.date); // Menambahkan tanggal
+    formData.append("price", updateEvent.price); // Menambahkan harga
+
+    if (updateEvent.image) {
+      formData.append("image", updateEvent.image);
+    }
+
+    const res = await fetch("/api", {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      setEventList((prev) => prev.map((event) => (event.id === updateEvent.id ? result.data : event)));
+      setUpdateEvent(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
-
-      setIsUpdating(true);
-
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
-
-      const timeout = setTimeout(async () => {
-        const res = await fetch("/api", {
-          method: "PUT",
-          body: formData,
-        });
-
-        setIsUpdating(false);
-
-        if (res.ok) {
-          const result = await res.json();
-          setEventList((prev) => prev.map((event) => (event.id === id ? result.data : event)));
-        }
-      }, 300);
-
-      setDebounceTimeout(timeout);
+    } else {
+      setError("Gagal memperbarui event. Coba lagi.");
     }
   };
 
   const handleDeleteEvent = async (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this event?");
+    const confirmDelete = confirm("Apakah Anda yakin ingin menghapus event ini?");
     if (confirmDelete) {
       const res = await fetch("/api", {
         method: "DELETE",
@@ -108,27 +108,23 @@ export default function EventList() {
     }
   };
 
-  const selectFile = () => {
-    return new Promise((resolve) => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-      input.onchange = (e) => resolve(e.target.files[0]);
-      input.click();
-    });
+  const handleEditClick = (event) => {
+    setUpdateEvent({ id: event.id, title: event.title, description: event.description, date: event.date, price: event.price, image: null });
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4 m-5">Event List</h1>
+      <h1 className="text-2xl font-bold mb-4 m-5">Daftar Event</h1>
       <ul className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 px-4 my-2">
         {eventList.map((event) => (
           <li key={event.id} className="mb-4">
-            <Image src={event.image || "/placeholder.png"} alt={event.title || "Default Placeholder"} width={300} height={300} className="w-full h-64 object-cover" />
+            <Image src={event.image || "/placeholder.png"} alt={event.title || "Placeholder"} width={300} height={300} className="w-full h-64 object-cover" />
             <h2 className="text-lg font-bold">{event.title}</h2>
             <p className="font-lg text-blue-600">{event.description}</p>
-            <button onClick={() => handleUpdateEvent(event.id)} className={`bg-yellow-500 text-white px-2 py-1 mt-2 rounded ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`} disabled={isUpdating}>
-              {isUpdating ? "Updating..." : "Update"}
+            <p className="text-sm font-medium text-gray-700">{event.date}</p> {/* Tampilkan Tanggal */}
+            <p className="font-bold text-green-600">Rp{event.price}</p> {/* Tampilkan Harga */}
+            <button onClick={() => handleEditClick(event)} className="bg-yellow-500 text-white px-2 py-1 mt-2 rounded">
+              Edit
             </button>
             <button onClick={() => handleDeleteEvent(event.id)} className="bg-red-500 text-white px-2 py-1 mt-2 ml-2 rounded">
               Delete
@@ -136,14 +132,33 @@ export default function EventList() {
           </li>
         ))}
       </ul>
-      <div className="border p-4">
-        <h2 className="text-xl font-bold mb-4">Add New Event</h2>
-        <input type="text" placeholder="Title" value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} className="border w-full p-2 mb-2" />
-        <textarea placeholder="Description" value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} className="border w-full p-2 mb-2" />
+
+      {updateEvent && (
+        <div className="border p-4 mt-4">
+          <h2 className="text-xl font-bold mb-4">Update Event</h2>
+          <input type="text" placeholder="Judul" value={updateEvent.title} onChange={(e) => setUpdateEvent({ ...updateEvent, title: e.target.value })} className="border w-full p-2 mb-2" />
+          <textarea placeholder="Deskripsi" value={updateEvent.description} onChange={(e) => setUpdateEvent({ ...updateEvent, description: e.target.value })} className="border w-full p-2 mb-2" />
+          <input type="file" ref={fileInputRef} onChange={(e) => setUpdateEvent({ ...updateEvent, image: e.target.files[0] })} className="border w-full p-2 mb-2" />
+          {error && <p className="text-red-500">{error}</p>}
+          <button onClick={handleUpdateEvent} className="bg-blue-500 text-white px-4 py-2 rounded">
+            Update Event
+          </button>
+          <button onClick={() => setUpdateEvent(null)} className="bg-gray-500 text-white px-4 py-2 ml-2 rounded">
+            Cancel
+          </button>
+        </div>
+      )}
+
+      <div className="border p-4 mt-4">
+        <h2 className="text-xl font-bold mb-4">Tambahkan Event Baru</h2>
+        <input type="text" placeholder="Judul" value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} className="border w-full p-2 mb-2" />
+        <textarea placeholder="Deskripsi" value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} className="border w-full p-2 mb-2" />
+        <input type="date" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} className="border w-full p-2 mb-2" />
+        <input type="number" placeholder="Harga" value={newEvent.price} onChange={(e) => setNewEvent({ ...newEvent, price: e.target.value })} className="border w-full p-2 mb-2" />
         <input type="file" ref={fileInputRef} onChange={(e) => setNewEvent({ ...newEvent, image: e.target.files[0] })} className="border w-full p-2 mb-2" />
         {error && <p className="text-red-500">{error}</p>}
         <button onClick={handleAddEvent} className="bg-blue-500 text-white px-4 py-2 rounded">
-          Add Event
+          Tambah Event
         </button>
       </div>
     </div>

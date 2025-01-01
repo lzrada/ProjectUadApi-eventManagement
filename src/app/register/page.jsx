@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import { registerWithEmailAndPassword } from "../../../services/firebase";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  
 
   const router = useRouter();
   const handleRegister = async (e) => {
@@ -29,31 +31,33 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <Image src="/images/bg-login.jpg" alt="bg-login" className="bg-image" fill={true} />
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-sm">
-        <div className="flex justify-center mb-6">
-          <button className="text-purple-600 border-b-2 border-purple-600 pb-2 mr-4">SIGN UP</button>
-        </div>
+    <div className="flex flex-col items-center justify-center min-h-screen relative">
+      <Image src="/images/bg-konser.jpg" alt="bg-register" className="absolute inset-0 z-0 object-cover" fill={true} />
+      <div className="bg-black bg-opacity-50 absolute inset-0"></div> 
+      <div className="absolute top-6 left-6">
+                        <img src="/images/logo epep.png" alt="Logo" className="w-30 h-10 shadow-md"/>
+                    </div>
+      <div className="relative bg-white bg-opacity-10 backdrop-blur-lg p-6 rounded-lg shadow-lg w-96 z-10">
+        <h2 className="text-2xl font-bold mb-4 text-white text-center">Sign Up</h2>
         <form onSubmit={handleRegister}>
-          <div className="mb-4">
-            <label className="block text-gray-600 mb-2">EMAIL ADDRESS</label>
-            <div className="relative">
-              <input type="email" placeholder="sugeng@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 border rounded-full gradient-border focus:outline-none" required />
+        <div className="mb-4">
+            <div className="flex items-center py-2 bg-white bg-opacity-20 rounded-lg">
+              <FontAwesomeIcon icon={faEnvelope} className="text-white ml-3 mr-4 fa-sm" style={{ fontSize: 20, width: 20 }} />
+              <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} className="appearance-none bg-transparent rounded-xl border-none w-full placeholder-gray-200 text-white py-1.5 px-2 leading-tight focus:outline-none" required />
               <i className="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
             </div>
           </div>
           <div className="mb-6">
-            <label className="block text-gray-600 mb-2">PASSWORD</label>
-            <div className="relative">
-              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 border rounded-full gradient-border focus:outline-none" required />
+            <div className="flex items-center py-2 bg-white bg-opacity-20 rounded-lg">
+              <FontAwesomeIcon icon={faLock} className="text-white ml-3 mr-4 fa-sm" style={{ fontSize: 20, width: 20 }} />
+              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="appearance-none bg-transparent rounded-xl border-none w-full placeholder-gray-200 text-white py-1.5 px-2 leading-tight focus:outline-none" required />
               <i className="fas fa-eye absolute right-3 top-3 text-gray-400"></i>
             </div>
           </div>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <button
             type="submit"
-            className={`w-full py-3 rounded-full text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:outline-none ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className="bg-transparent border-2 border-white text-white w-full px-6 py-2 rounded-full font-medium shadow-md hover:bg-white hover:text-black transition-colors"
             disabled={isLoading}
           >
             {isLoading ? (

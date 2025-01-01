@@ -21,16 +21,22 @@ export async function POST(req) {
     const formData = await req.formData();
     const title = formData.get("title");
     const description = formData.get("description");
+    const date = formData.get("date"); // Menambahkan tanggal
+    const price = parseFloat(formData.get("price")); // Menambahkan harga
     const imageFile = formData.get("image");
 
-    // Generate image name and save image to the server
+    // Validasi
+    if (!title || !description || !date || !price || !imageFile) {
+      throw new Error("Missing required fields");
+    }
+
     const imageName = `${Date.now()}-${imageFile.name}`;
     const filePath = `/images/api/${imageName}`;
     const absolutePath = path.join(process.cwd(), "public", filePath);
     const buffer = Buffer.from(await imageFile.arrayBuffer());
     fs.writeFileSync(absolutePath, buffer);
 
-    const newEvent = { title, description, image: filePath };
+    const newEvent = { title, description, date, price, image: filePath };
     const eventCollection = collection(db, "events");
     const docRef = await addDoc(eventCollection, newEvent);
 
@@ -47,19 +53,20 @@ export async function PUT(req) {
     const id = formData.get("id");
     const title = formData.get("title");
     const description = formData.get("description");
+    const date = formData.get("date"); // Menambahkan tanggal
+    const price = parseFloat(formData.get("price")); // Menambahkan harga
     const imageFile = formData.get("image");
 
     const eventDoc = doc(db, "events", id);
-    const updateData = { title, description };
+    const updateData = { title, description, date, price };
 
-    // Check if new image is uploaded and handle the image upload
     if (imageFile && imageFile.size > 0) {
       const imageName = `${Date.now()}-${imageFile.name}`;
       const filePath = `/images/api/${imageName}`;
       const absolutePath = path.join(process.cwd(), "public", filePath);
       const buffer = Buffer.from(await imageFile.arrayBuffer());
       fs.writeFileSync(absolutePath, buffer);
-      updateData.image = filePath; // Update image path if a new image is uploaded
+      updateData.image = filePath;
     }
 
     await updateDoc(eventDoc, updateData);
@@ -75,17 +82,14 @@ export async function DELETE(req) {
     const { id } = await req.json();
     const eventDoc = doc(db, "events", id);
 
-    // Retrieve event data to get the image info to delete
     const eventData = await getDoc(eventDoc);
     const imagePath = eventData.data()?.image;
 
     if (imagePath) {
       const imageFilePath = path.join(process.cwd(), "public", imagePath);
-      // Delete image from disk
       fs.unlinkSync(imageFilePath);
     }
 
-    // Delete event from Firestore
     await deleteDoc(eventDoc);
     return NextResponse.json({ message: "Event deleted" });
   } catch (error) {
