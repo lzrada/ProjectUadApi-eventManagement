@@ -62,10 +62,10 @@ const HomePage = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <ul className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4">
+          <ul className="grid md:grid-cols-3 sm:grid-cols-3 grid-cols-2 gap-4">
             {eventList.map((event) => (
               <li key={event.id} className="bg-gray-100 p-4 rounded shadow">
-                <img src={event.image || "/placeholder.png"} alt={event.title || "Default Placeholder"} className="w-full h-48 object-cover mb-2 rounded" />
+                <img src={event.image || "/placeholder.png"} alt={event.title || "Default Placeholder"} className="w-full h-40 object-cover mb-2 rounded" />
                 <p className="mt-2 text-gray-700 font-bold">{event.title || "Untitled Event"}</p>
                 <p className="mt-2 text-gray-700 ">{event.description || "Untitled description"}</p>
                 <div className="mt-2 grid grid-cols-2 items-center">

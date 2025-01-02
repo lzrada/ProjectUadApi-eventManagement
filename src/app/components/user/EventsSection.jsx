@@ -51,11 +51,11 @@ export default function EventsSection() {
       window.snap.pay(token, {
         onSuccess: function (result) {
           console.log("Payment success:", result);
-          window.location.href = "/user?status=success";
+          window.location.href = "/dashboard-user?status=success";
         },
         onPending: function (result) {
           console.log("Payment pending:", result);
-          window.location.href = "/user?status=pending";
+          window.location.href = "/dashboard-user?status=pending";
         },
         onError: function (result) {
           console.error("Payment error:", result);
@@ -85,7 +85,7 @@ export default function EventsSection() {
             {events.map((event) => (
               <div key={event.id} className="bg-white shadow-md rounded-lg overflow-hidden">
                 {event.image ? (
-                  <img src={event.image} alt={event.title || "Event Image"} className="w-full h-48 object-cover" />
+                  <img src={event.image} alt={event.title || "Event Image"} className="w-full h-48 object-cover " />
                 ) : (
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-500">No Image Available</span>

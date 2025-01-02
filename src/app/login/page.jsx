@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { loginWithEmailAndPassword } from "../../../services/firebase";
+// import { loginWithEmailAndPassword } from "../../../services/firebase";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -16,15 +16,30 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const user = await loginWithEmailAndPassword(email, password);
-      console.log("Logged in user:", user);
-      if (email === "admin@gmail.com" && password === "12345678") {
-        router.push("/dashboard"); // Redirect to dashboard after login
+      const response = await fetch("/../api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid email or password.");
+      }
+
+      const data = await response.json(); // Ambil data dari API
+
+      if (data.token) {
+        localStorage.setItem("token", data.token); // Menyimpan token ke localStorage
+        console.log("Token disimpan:", data.token); // Debugging token
+
+        router.push("/dashboard-user");
       } else {
-        router.push("/user");
+        setError("Failed to retrieve token. Please try again.");
       }
     } catch (err) {
-      setError("Invalid email or password.");
+      setError(err.message || "An error occurred. Please try again.");
     }
   };
 

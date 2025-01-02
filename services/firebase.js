@@ -1,6 +1,7 @@
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import jwt from "jsonwebtoken";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -17,8 +18,18 @@ export const auth = getAuth(app);
 export const loginWithEmailAndPassword = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    const user = userCredential.user;
+
+    // Generate JWT
+    const token = jwt.sign(
+      { uid: user.uid, email: user.email }, // Payload
+      process.env.NEXT_PUBLIC_JWT_SECRET, // Secret key
+      { expiresIn: "1h" } // Token expiration
+    );
+
+    return { user, token };
   } catch (error) {
+    console.error("Error generating token:", error);
     throw new Error(error.message);
   }
 };
