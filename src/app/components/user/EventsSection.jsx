@@ -85,7 +85,7 @@ export default function EventsSection() {
             {events.map((event) => (
               <div key={event.id} className="bg-white shadow-md rounded-lg overflow-hidden">
                 {event.image ? (
-                  <img src={event.image} alt={event.title || "Event Image"} className="w-full h-48 object-cover " />
+                  <img src={event.image} alt={event.title || "Event Image"} className="w-full h-[500px]" />
                 ) : (
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-500">No Image Available</span>

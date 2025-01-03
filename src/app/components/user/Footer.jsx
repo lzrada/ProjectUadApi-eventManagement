@@ -33,7 +33,7 @@ export default function Footer() {
         </div>
         <div>
           <h2 className="text-lg font-bold">Contact Us</h2>
-          <p className="mt-2">+02 574 328 301</p>
+          <p className="mt-2">+61 81 334 215 525</p>
           {/* Tombol Logout */}
           <button
             onClick={() => {

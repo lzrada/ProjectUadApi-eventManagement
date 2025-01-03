@@ -32,56 +32,23 @@ export default function Sidebar() {
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className={`flex flex-shrink-0 ${isOpen ? "w-64" : "w-16"} bg-gray-800 text-white duration-300 overflow-none`}>
-        <div className="flex flex-col items-start justify-between min-h-screen">
-          {/* Toggle Button */}
-          <button className="p-4 focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? "🔙" : "☰"}
-          </button>
+      
 
-          {/* Centered Navigation */}
-          <div className="flex flex-col flex-grow justify-center space-y-4">
-            <Link href="/dashboard">
-              <p className="flex items-center px-4 py-2 hover:bg-gray-700 rounded-md">
-                <span className="text-2xl">🏠</span>
-                {isOpen && <span className="ml-4">Dashboard</span>}
-              </p>
-            </Link>
-
-            <Link href="/settings">
-              <p className="flex items-center px-4 py-2 hover:bg-gray-700 rounded-md">
-                <span className="text-2xl">⚙️</span>
-                {isOpen && <span className="ml-4">Settings Events</span>}
-              </p>
-            </Link>
-          </div>
-
-          {/* Log Out */}
-          <div
-            className="flex items-center px-4 py-2 hover:bg-gray-700 cursor-pointer rounded-md mb-12"
-            onClick={() => {
-              localStorage.removeItem("token");
-              router.push("/login");
-            }}
-          >
-            <span className="text-2xl my-2">⬅️</span>
-            {isOpen && <span className="ml-4">Log Out</span>}
-          </div>
-
-          {/* Footer */}
-          {isOpen && (
-            <footer className="mb-4 px-4">
-              <p className="text-xs">&copy; 2024 ours app</p>
-            </footer>
-          )}
-        </div>
-      </div>
-
-      {/* Main Content */}
       <div className="flex-grow p-4 overflow-y-auto">
         <div className="flex flex-col items-center">
-          <h1 className="text-xl font-semibold">Welcome Admin</h1>
+          <div className="flex w-full items-center">
+            <h1 className="text-xl ml-auto font-semibold">Welcome Admin</h1>
+            <button
+              className="bg-red-500 text-white p-4 py-2 rounded ml-auto"
+              onClick={() => {
+                localStorage.removeItem("token");
+                router.push("/login");
+              }}
+            >
+              Logout
+            </button>
+          </div>
+
           <EventList />
         </div>
       </div>

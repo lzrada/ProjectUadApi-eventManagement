@@ -10,8 +10,8 @@ export default function EventList() {
     title: "",
     description: "",
     image: null,
-    date: "", // Menambahkan inisialisasi untuk date
-    price: "", // Menambahkan inisialisasi untuk price
+    date: "",
+    price: "",
   });
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
@@ -27,8 +27,8 @@ export default function EventList() {
   };
 
   const handleAddEvent = async () => {
-    if (!newEvent.title || !newEvent.description || !newEvent.image) {
-      setError("Judul, deskripsi, dan gambar tidak boleh kosong!");
+    if (!newEvent.title || !newEvent.description || !newEvent.image || !newEvent.date || !newEvent.price) {
+      setError("Semua field wajib diisi!");
       return;
     }
 
@@ -59,8 +59,8 @@ export default function EventList() {
   };
 
   const handleUpdateEvent = async () => {
-    if (!updateEvent.title || !updateEvent.description) {
-      setError("Judul dan deskripsi tidak boleh kosong!");
+    if (!updateEvent.title || !updateEvent.description || !updateEvent.date || !updateEvent.price) {
+      setError("Semua field wajib diisi!");
       return;
     }
 
@@ -70,8 +70,8 @@ export default function EventList() {
     formData.append("id", updateEvent.id);
     formData.append("title", updateEvent.title);
     formData.append("description", updateEvent.description);
-    formData.append("date", updateEvent.date); // Menambahkan tanggal
-    formData.append("price", updateEvent.price); // Menambahkan harga
+    formData.append("date", updateEvent.date);
+    formData.append("price", updateEvent.price);
 
     if (updateEvent.image) {
       formData.append("image", updateEvent.image);
@@ -112,14 +112,14 @@ export default function EventList() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4 m-5">Daftar Event</h1>
-      <ul className={`grid ${isOpen ? "md:grid-cols-3" : "md:grid-cols-4"} sm:grid-cols-2 grid-cols-1 gap-4 px-4 my-2`}>
+      <ul className=  {`grid ${isOpen ? "md:grid-cols-3" : "md:grid-cols-4"} sm:grid-cols-2 grid-cols-1 gap-4 px-4 my-2`}>
         {eventList.map((event) => (
           <li key={event.id} className="border rounded-md overflow-hidden shadow-md bg-white">
-            <div className="relative w-full h-48">
-              <Image src={event.image || "/placeholder.png"} alt={event.title || "Placeholder"} layout="fill" objectFit="cover" />
+            <div className="relative w-full h-auto object-cover">
+              <Image src={event.image || "/placeholder.png"} alt={event.title || "Placeholder"} width={500} height={500} className="w-full h-[500px]" />
             </div>
             <div className="p-4">
-              <h2 className="text-lg font-bold truncate">{event.title}</h2>
+              <h2 className="text-lg font-bold truncate mt-2">{event.title}</h2>
               <p className="text-blue-600 truncate">{event.description}</p>
               <p className="text-sm font-medium text-gray-700">{event.date}</p>
               <p className="font-bold text-green-600">Rp{event.price}</p>
@@ -154,7 +154,6 @@ export default function EventList() {
         </div>
       )}
 
-      {/* Hanya tampilkan form Add Event jika tidak ada updateEvent */}
       {!updateEvent && (
         <div className="border p-4 mt-4">
           <h2 className="text-xl font-bold mb-4">Tambahkan Event Baru</h2>
