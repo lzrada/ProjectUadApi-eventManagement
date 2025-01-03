@@ -77,7 +77,7 @@ const HomePage = () => {
           </ul>
         )}
       </div>
-      <footer className="bg-gray-600 text-white py-8">
+      <footer className="bg-gray-600 text-white py-2">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Alamat Perusahaan */}
           <div>

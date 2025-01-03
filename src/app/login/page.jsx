@@ -34,7 +34,11 @@ export default function Login() {
         localStorage.setItem("token", data.token); // Menyimpan token ke localStorage
         console.log("Token disimpan:", data.token); // Debugging token
 
-        router.push("/dashboard-user");
+        if (email === "admin@gmail.com" && password === "12345678") {
+          router.push("/dashboard-admin");
+        } else {
+          router.push("/dashboard-user");
+        }
       } else {
         setError("Failed to retrieve token. Please try again.");
       }
